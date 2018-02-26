@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding:utf8 -*-
 
-__author__ = "Jean (jsantos@uoldiveo.com)"
+__author__ = "Jean (jean.guirro@hotmail.com)"
 __version__ = "1.3"
 __date__ = "$Date: 2016/04/08 03:00:00 $"
 __license__ = "Python"
@@ -19,7 +19,7 @@ from collections import Counter
 hostname = (socket.gethostname())
 timestamp = int(time.time())
 
-# Funcao de help.
+# Help function
 def usage():
     """
     usage() - Funcao de help do script
@@ -32,6 +32,7 @@ def usage():
 \n'
 
 
+# Verify arguments
 try:
     Optargs, Args = getopt.getopt(sys.argv[1:],"t:r:",["type-metric=","regex="])
 except getopt.GetoptError, error:
@@ -66,15 +67,14 @@ except:
     sys.exit(usage())
 
 
-resultado = []
+result_list = []
 
 regex = config.get(TypeMetric, REGEX)
 with open(log, 'r') as f_data:
     for event in f_data:
         try:
             result = re.findall(regex, event)
-            #print result
-            resultado.append(result[-1])
+            result_list.append(result[-1])
         except ValueError:
             pass
         except IndexError:
@@ -82,20 +82,20 @@ with open(log, 'r') as f_data:
 
 
 
-result_count = Counter(resultado)
+result_count = Counter(result_list)
 
 if output == 'raw':
-    for dado, count in result_count.most_common():
-        print dado, count
+    for data, count in result_count.most_common():
+        print data, count
 
 
 if output == 'graphite':
     prefix = config.get('METRIC', 'PREFIX')
-    for dado, count in result_count.most_common():
+    for data, count in result_count.most_common():
         
-        #Elimina os pontos do dado
+        #Remove dot to avoid creating unwanted nodes in graphite
         try:
-            dado = re.sub(r'\.', '_', dado)
+            data = re.sub(r'\.', '_', data)
         except TypeError:
             pass
 
